@@ -44,15 +44,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bookinglayoutbyfigma.R
+import androidx.compose.foundation.clickable
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    onHotelClick: () -> Unit = {}
+) {
     Scaffold { paddingValues ->
         Column {
             TopBar()
             TitleText()
-            LazyRowHotels()
+            LazyRowHotels(onHotelClick = onHotelClick)
         }
     }
 }
@@ -91,7 +94,9 @@ fun TitleText(){
 }
 
 @Composable
-fun LazyRowHotels(){
+fun LazyRowHotels(
+    onHotelClick: () -> Unit
+){
 
     Column {
         Row(modifier = Modifier
@@ -117,8 +122,8 @@ fun LazyRowHotels(){
     }
 
     LazyRow {
-        item{ HotelCard() }
-        item{ HotelCard() }
+        item{ HotelCard(onClick = onHotelClick) }
+        item{ HotelCard(onClick = onHotelClick) }
     }
 
 
@@ -127,13 +132,16 @@ fun LazyRowHotels(){
 
 
 @Composable
-fun HotelCard(){
+fun HotelCard(
+    onClick: () -> Unit
+){
     Column(
         modifier = Modifier
             .padding(15.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(Color(0xFFFFFFFF), RoundedCornerShape(8.dp))
             .width(300.dp)
+            .clickable { onClick() }
     ) {
         Column(modifier = Modifier.padding(top = 20.dp)) {
             Image(
