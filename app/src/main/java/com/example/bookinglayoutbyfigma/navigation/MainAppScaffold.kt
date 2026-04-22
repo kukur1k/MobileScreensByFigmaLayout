@@ -107,7 +107,6 @@ fun MainAppScaffold(navController: NavHostController) {
         Box(
             Modifier
                 .fillMaxSize()
-                .background(Color.White)
                 .padding(paddingValues)
         ) {
             AppNavigation(navController)
