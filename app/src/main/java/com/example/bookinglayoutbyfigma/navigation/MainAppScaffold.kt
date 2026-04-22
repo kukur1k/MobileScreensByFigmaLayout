@@ -50,6 +50,7 @@ fun MainAppScaffold(navController: NavHostController) {
     }
 
     Scaffold(
+        containerColor = Color.Transparent,
         bottomBar = {
             if(shouldShowBottomNav) {
                 BottomNavigationPanel(

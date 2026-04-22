@@ -78,9 +78,9 @@ fun BottomNavigationPanel(
 ) {
     Box(
         modifier = Modifier
-            .padding(5.dp)
             .height(80.dp)
             .fillMaxWidth()
+            .background(Color.Transparent)
     ) {
         Card(
             modifier = Modifier
