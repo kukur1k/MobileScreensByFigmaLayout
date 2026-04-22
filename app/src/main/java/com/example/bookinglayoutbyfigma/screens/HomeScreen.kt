@@ -7,22 +7,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -30,14 +26,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,13 +43,21 @@ import androidx.compose.foundation.clickable
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(
-    onHotelClick: () -> Unit = {}
+    onHotelClick: () -> Unit = {},
+    onFavoriteClick: (Int) -> Unit = {}
 ) {
     Scaffold { paddingValues ->
         Column {
             TopBar()
             TitleText()
-            LazyRowHotels(onHotelClick = onHotelClick)
+            LazyRowHotels(
+                onHotelClick = onHotelClick,
+                onFavoriteClick = onFavoriteClick,
+                hotelImages = listOf(
+                    R.drawable.hotelimg1,
+                    R.drawable.hotelimg1,
+                )
+            )
         }
     }
 }
@@ -95,9 +97,10 @@ fun TitleText(){
 
 @Composable
 fun LazyRowHotels(
-    onHotelClick: () -> Unit
+    onHotelClick: () -> Unit,
+    onFavoriteClick: (Int) -> Unit,
+    hotelImages: List<Int>
 ){
-
     Column {
         Row(modifier = Modifier
             .fillMaxWidth(),
@@ -122,18 +125,21 @@ fun LazyRowHotels(
     }
 
     LazyRow {
-        item{ HotelCard(onClick = onHotelClick) }
-        item{ HotelCard(onClick = onHotelClick) }
+        items(hotelImages.size) { index ->
+            HotelCard(
+                onClick = onHotelClick,
+                imageRes = hotelImages[index],
+                onFavoriteClick = { onFavoriteClick(index) }
+            )
+        }
     }
-
-
-
 }
-
 
 @Composable
 fun HotelCard(
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    imageRes: Int,
+    onFavoriteClick: () -> Unit
 ){
     Column(
         modifier = Modifier
@@ -144,13 +150,31 @@ fun HotelCard(
             .clickable { onClick() }
     ) {
         Column(modifier = Modifier.padding(top = 20.dp)) {
-            Image(
-                painter = painterResource(id = R.drawable.hotelimg1),
-                contentDescription = "photo",
-                modifier = Modifier
-                    .size(300.dp)
-                    .fillMaxWidth()
-            )
+            Box {
+                Image(
+                    painter = painterResource(id = imageRes),
+                    contentDescription = "photo",
+                    modifier = Modifier
+                        .size(300.dp)
+                        .fillMaxWidth()
+                )
+
+                IconButton(
+                    onClick = onFavoriteClick,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(end = 30.dp, top = 10.dp)
+                        .clip(CircleShape)
+                        .size(45.dp)
+                        .background(Color.Black.copy(alpha = 0.3f))
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.FavoriteBorder,
+                        contentDescription = "Favorite",
+                        tint = Color.White
+                    )
+                }
+            }
 
             Row(
                 modifier = Modifier
@@ -165,9 +189,7 @@ fun HotelCard(
                     fontWeight = FontWeight.SemiBold
                 )
                 Row(
-                    modifier = Modifier,
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         modifier = Modifier.padding(bottom = 4.dp, end = 3.dp),
@@ -185,17 +207,16 @@ fun HotelCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 14.dp, end = 10.dp ),
+                    .padding(start = 14.dp, end = 10.dp),
                 horizontalArrangement = Arrangement.spacedBy(5.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                     Image(
                         painter = painterResource(id = R.drawable.pointicon),
-                        contentDescription = "photo",
+                        contentDescription = "location",
                         modifier = Modifier
                             .size(25.dp)
-                            .fillMaxWidth()
                             .padding(end = 5.dp)
                     )
                     Text(
@@ -207,22 +228,15 @@ fun HotelCard(
 
                 Image(
                     painter = painterResource(id = R.drawable.facereviews),
-                    contentDescription = "photo",
+                    contentDescription = "reviews",
                     modifier = Modifier
                         .height(50.dp)
                         .width(100.dp)
                 )
-
-
             }
-
-
-
         }
-
     }
 }
-
 
 @Composable
 fun TopBar(){
@@ -265,11 +279,8 @@ fun TopBar(){
                         fontSize = 16.sp
                     )
                 }
-
-
             }
         }
-
 
         IconButton(onClick = {},
             modifier = Modifier
@@ -279,13 +290,10 @@ fun TopBar(){
                 .shadow(10.dp, RectangleShape)
                 .background(Color(0xFFF5F5F7))
         ) {
-
             Icon(
                 imageVector = Icons.Default.Notifications,
-                contentDescription = "ChangeAccount"
+                contentDescription = "Notifications"
             )
-
-
         }
     }
 }

@@ -1,10 +1,9 @@
 package com.example.bookinglayoutbyfigma.screens
 
 import android.annotation.SuppressLint
-import android.media.Image
-import androidx.compose.animation.core.withInfiniteAnimationFrameMillis
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,14 +16,15 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -38,42 +38,59 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.room.util.TableInfo
 import com.example.bookinglayoutbyfigma.R
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "Range")
 fun TourInfoScreen(
     onBack: () -> Unit = {}
 ){
     Scaffold { paddingValues ->
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)){
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White)
+        ){
             Column(modifier = Modifier.fillMaxSize()) {
                 ImageTopCard(onBack = onBack)
-                Box(
-                    modifier = Modifier.fillMaxWidth()
-                        .weight(1f)
-                        .background(Color.White)
-                ){
-                    DataSlider()
-                }
+                DataSlider(modifier = Modifier.weight(1f))
             }
         }
+    }
+}
 
+class ArcTopShape(private val arcHeight: Float = 30f) : Shape {
+    override fun createOutline(
+        size: Size,
+        layoutDirection: LayoutDirection,
+        density: Density
+    ): Outline {
+        val path = Path().apply {
+            moveTo(0f, size.height)
+            lineTo(0f, arcHeight)
+            quadraticBezierTo(
+                size.width / 2,
+                -arcHeight,
+                size.width,
+                arcHeight
+            )
+            lineTo(size.width, size.height)
+            close()
+        }
+        return Outline.Generic(path)
     }
 }
 
@@ -115,9 +132,7 @@ fun Description(){
                 .padding(vertical = 4.dp)
         )
     }
-
 }
-
 
 @Composable
 fun PhotoViews(){
@@ -142,17 +157,15 @@ fun PhotoViews(){
                     .clip(RoundedCornerShape(8.dp))
                     .height(50.dp)
                     .width(50.dp)
-
             )
         }
     }
-
 }
 
 @Composable
 fun BookingButton(){
-    Button(modifier = Modifier
-        .fillMaxWidth(),
+    Button(
+        modifier = Modifier.fillMaxWidth(),
         onClick = {},
         shape = RoundedCornerShape(size = 15.dp),
         colors = ButtonDefaults.buttonColors(
@@ -163,155 +176,154 @@ fun BookingButton(){
             Text(
                 text = "Book Now",
                 fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
+                color = Color.White
             )
         }
-
     }
 }
 
 @Composable
-fun DataSlider(){
+fun DataSlider(modifier: Modifier = Modifier){
     Box(
-        modifier = Modifier
-            .offset(y = (-100).dp)
-            .shadow(10.dp, RoundedCornerShape(60.dp))
-            .clip(RoundedCornerShape(60.dp))
-            .background(Color.White)
-            .fillMaxHeight()
-    ){
+        modifier = modifier
+            .offset(y = (-60).dp)
+            .fillMaxWidth()
+    ) {
         Column(
             modifier = Modifier
-                .background(color = Color.White)
-                .clip(RoundedCornerShape(8.dp))
-                .padding(20.dp)
-        ) {
-            Row(
+                .fillMaxWidth()
+                .fillMaxSize()
+                .shadow(10.dp, RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp))
+                .clip(ArcTopShape(arcHeight = 20f))
+                .background(Color.White)
+                .verticalScroll(rememberScrollState())
+        ){
+            Column(
                 modifier = Modifier
+                    .background(color = Color.White)
                     .fillMaxWidth()
-                    .padding(vertical = 15.dp)
-                    .background(Color.White),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                Column {
-                    Text(
-                        text = "Niladri Reservoir",
-                        fontSize = 25.sp,
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "Tekergat, Sunamgnj",
-                        fontSize = 20.sp,
-                        color = Color(0xFF7C838C)
-                    )
-                }
-
-                Image(
-                    painter = painterResource(id = R.drawable.avatar),
-                    contentDescription = "photo",
-                    modifier = Modifier
-                        .height(60.dp)
-                        .width(60.dp)
-                        .clip(CircleShape)
-                )
-
-
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(20.dp)
             ) {
-                Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 15.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Column {
+                        Text(
+                            text = "Niladri Reservoir",
+                            fontSize = 25.sp,
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "Tekergat, Sunamgnj",
+                            fontSize = 20.sp,
+                            color = Color(0xFF7C838C)
+                        )
+                    }
+
                     Image(
-                        painter = painterResource(id = R.drawable.pointicon),
+                        painter = painterResource(id = R.drawable.avatar),
                         contentDescription = "photo",
                         modifier = Modifier
-                            .size(20.dp)
-                            .fillMaxWidth()
-                            .padding(end = 5.dp)
-                    )
-                    Text(
-                        text = "Tekergat",
-                        fontSize = 18.sp,
-                        color = Color(0xFF7C838C)
-                    )
-                }
-
-
-                Row(
-                    modifier = Modifier,
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        modifier = Modifier.padding(bottom = 4.dp, end = 3.dp),
-                        text = "★",
-                        fontSize = 18.sp,
-                        color = Color(0xFFFFD700)
-                    )
-                    Text(
-                        text = "4.7",
-                        fontSize = 18.sp
-                    )
-                    Text(
-                        text = "(2498)",
-                        fontSize = 18.sp,
-                        color = Color(0xFF7C838C)
-
+                            .height(60.dp)
+                            .width(60.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
                     )
                 }
 
                 Row(
-                    modifier = Modifier,
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                        Image(
+                            painter = painterResource(id = R.drawable.pointicon),
+                            contentDescription = "photo",
+                            modifier = Modifier
+                                .size(20.dp)
+                                .padding(end = 5.dp)
+                        )
+                        Text(
+                            text = "Tekergat",
+                            fontSize = 18.sp,
+                            color = Color(0xFF7C838C)
+                        )
+                    }
 
-                    Text(
-                        text = "$59",
-                        fontSize = 18.sp,
-                        color = Color(0xFF3FC1ED)
-                    )
-                    Text(
-                        text = "/Person",
-                        fontSize = 18.sp,
-                        color = Color(0xFF7C838C)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(bottom = 4.dp, end = 3.dp),
+                            text = "★",
+                            fontSize = 18.sp,
+                            color = Color(0xFFFFD700)
+                        )
+                        Text(
+                            text = "4.7",
+                            fontSize = 18.sp
+                        )
+                        Text(
+                            text = "(2498)",
+                            fontSize = 18.sp,
+                            color = Color(0xFF7C838C)
+                        )
+                    }
 
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "$59",
+                            fontSize = 18.sp,
+                            color = Color(0xFF3FC1ED)
+                        )
+                        Text(
+                            text = "/Person",
+                            fontSize = 18.sp,
+                            color = Color(0xFF7C838C)
+                        )
+                    }
                 }
 
+                PhotoViews()
+                Description()
 
+                Spacer(modifier = Modifier.height(20.dp))
+
+                BookingButton()
+
+                Spacer(modifier = Modifier.height(30.dp))
             }
-
-            PhotoViews()
-            Description()
-            BookingButton()
         }
     }
-
 }
-
 
 @Composable
 fun ImageTopCard(
     onBack: () -> Unit
 ){
     Box(modifier = Modifier
-        .fillMaxWidth()){
+        .fillMaxWidth()
+        .height(320.dp)){
         Image(
             painter = painterResource(id = R.drawable.backphoto),
             contentDescription = "photo",
             modifier = Modifier
-                .fillMaxWidth()
-                .height(400.dp)
+                .fillMaxSize(),
+            contentScale = ContentScale.Crop
         )
         AppBar(onBack = onBack)
     }
 }
+
 @Composable
 fun AppBar(
     onBack: () -> Unit
@@ -321,8 +333,8 @@ fun AppBar(
         .padding(start = 20.dp, end = 20.dp, top = 50.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically) {
-        //кнопка для вывхода
-        IconButton(onClick = {onBack},
+
+        IconButton(onClick = onBack,
             modifier = Modifier
                 .clip(CircleShape)
                 .height(45.dp)
@@ -331,7 +343,8 @@ fun AppBar(
         ) {
             Icon(
                 imageVector = Icons.Default.KeyboardArrowLeft,
-                contentDescription = "back"
+                contentDescription = "back",
+                tint = Color.White
             )
         }
 
@@ -342,7 +355,6 @@ fun AppBar(
             fontWeight = FontWeight.Bold
         )
 
-        //кнопка для избранного
         IconButton(onClick = {},
             modifier = Modifier
                 .clip(CircleShape)
@@ -352,19 +364,15 @@ fun AppBar(
         ) {
             Icon(
                 imageVector = Icons.Default.FavoriteBorder,
-                contentDescription = "Favorite"
+                contentDescription = "Favorite",
+                tint = Color.White
             )
         }
     }
 }
-
-
-
-
 
 @Preview(showBackground = true)
 @Composable
 fun TourInfoScreenPreview() {
     TourInfoScreen()
 }
-
